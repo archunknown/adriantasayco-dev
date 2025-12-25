@@ -93,6 +93,7 @@ export default async function HomePage() {
     projectsResult,
     experienceResult,
     certificatesResult,
+    techStackResult,
   ] = await Promise.all([
     supabase
       .from("profile")
@@ -128,12 +129,17 @@ export default async function HomePage() {
       .from("certificates")
       .select("id, title_es, title_en, issuer, issue_date")
       .order("issue_date", { ascending: false }),
+    supabase
+      .from("tech_stack")
+      .select("id, name, category, icon_slug")
+      .order("category", { ascending: true }),
   ])
 
   const profile = profileResult.data ?? null
   const projects = normalizeProjects(projectsResult.data ?? [])
   const experience = experienceResult.data ?? []
   const certificates = certificatesResult.data ?? []
+  const techStack = techStackResult.data ?? []
 
   return (
     <LanguageProvider>
@@ -142,6 +148,7 @@ export default async function HomePage() {
         projects={projects}
         experience={experience}
         certificates={certificates}
+        techStack={techStack}
       />
     </LanguageProvider>
   )

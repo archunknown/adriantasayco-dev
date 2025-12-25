@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import LanguageToggle from "@/components/LanguageToggle"
 import { useTranslation } from "@/context/LanguageContext"
 import { Skeleton } from "@/components/ui/skeleton"
+import SystemModules, { TechStack } from "./SystemModules"
 
 type Profile = {
   id: string
@@ -56,6 +57,7 @@ type MonitorConsoleProps = {
   projects: Project[]
   experience: Experience[]
   certificates: Certificate[]
+  techStack: TechStack[]
 }
 
 // Skeleton Components
@@ -107,6 +109,7 @@ export default function MonitorConsole({
   projects,
   experience,
   certificates,
+  techStack,
 }: MonitorConsoleProps) {
   const { lang, isMounted } = useTranslation()
   const activeLang = isMounted ? lang : "es"
@@ -304,6 +307,9 @@ export default function MonitorConsole({
             )}
           </div>
         </section>
+
+        {/* Tech Modules */}
+        <SystemModules modules={techStack} />
 
         <section className="space-y-4">
           <div className="flex items-center justify-between">
