@@ -4,7 +4,7 @@ import Link from "next/link"
 import { ReactNode } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
-import { LayoutDashboard, FolderCode, History, Award, UserCircle, LogOut } from "lucide-react"
+import { LayoutDashboard, FolderCode, History, Award, UserCircle, LogOut, Cpu } from "lucide-react"
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
     const router = useRouter()
@@ -13,6 +13,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         { name: "Resumen", href: "/admin", icon: LayoutDashboard },
         { name: "Perfil", href: "/admin/profile", icon: UserCircle },
         { name: "Proyectos", href: "/admin/projects", icon: FolderCode },
+        { name: "Tecnologías", href: "/admin/tech", icon: Cpu },
         { name: "Experiencia", href: "/admin/experience", icon: History },
         { name: "Certificados", href: "/admin/certificates", icon: Award },
     ]
