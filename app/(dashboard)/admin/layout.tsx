@@ -1,8 +1,14 @@
+"use client"
+
 import Link from "next/link"
 import { ReactNode } from "react"
+import { useRouter } from "next/navigation"
+import { createClient } from "@/lib/supabase/client"
 import { LayoutDashboard, FolderCode, History, Award, UserCircle, LogOut } from "lucide-react"
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
+    const router = useRouter()
+    const supabase = createClient()
     const navItems = [
         { name: "Resumen", href: "/admin", icon: LayoutDashboard },
         { name: "Perfil", href: "/admin/profile", icon: UserCircle },
@@ -14,7 +20,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     return (
         <div className="flex min-h-screen bg-zinc-950 text-zinc-100 font-mono">
             {/* Sidebar de Control */}
-            <aside className="w-64 border-r border-zinc-800 bg-black p-4">
+            <aside className="flex w-64 flex-col border-r border-zinc-800 bg-black p-4">
                 <div className="mb-8 px-2 text-xs font-bold uppercase tracking-widest text-zinc-500">
                     Admin_Kernel_v1.0
                 </div>
@@ -30,6 +36,17 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                         </Link>
                     ))}
                 </nav>
+                <button
+                    type="button"
+                    onClick={async () => {
+                        await supabase.auth.signOut()
+                        router.push("/")
+                    }}
+                    className="mt-auto flex items-center gap-3 rounded-sm px-3 py-2 text-sm text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-white"
+                >
+                    <LogOut className="h-4 w-4" />
+                    Cerrar sesión
+                </button>
             </aside>
 
             {/* Área de Trabajo */}

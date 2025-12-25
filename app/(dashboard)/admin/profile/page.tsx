@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Loader2, Save, Upload } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export default function ProfileAdminPage() {
     const [loading, setLoading] = useState(true)
@@ -42,7 +43,7 @@ export default function ProfileAdminPage() {
 
     useEffect(() => {
         async function fetchProfile() {
-            const { data, error } = await supabase
+            const { data } = await supabase
                 .from("profile")
                 .select("*")
                 .eq("id", SINGLETON_ID)
@@ -50,8 +51,8 @@ export default function ProfileAdminPage() {
 
             if (data) {
                 // Sanitización: Convertir cualquier valor null en ""
-                const sanitizedData = Object.keys(data).reduce((acc: any, key) => {
-                    acc[key] = data[key] === null ? "" : data[key];
+                const sanitizedData = Object.keys(data).reduce<Record<string, unknown>>((acc, key) => {
+                    acc[key] = data[key as keyof typeof data] === null ? "" : data[key as keyof typeof data];
                     return acc;
                 }, {});
 
@@ -107,15 +108,67 @@ export default function ProfileAdminPage() {
                 .eq("id", SINGLETON_ID)
 
             toast.success("Avatar actualizado", { id: loadingToast })
-        } catch (error: any) {
-            toast.error("Fallo en subida: " + error.message, { id: loadingToast })
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : "Error desconocido"
+            toast.error("Fallo en subida: " + message, { id: loadingToast })
         }
     }
 
     if (loading) {
         return (
-            <div className="flex h-96 items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-zinc-500" />
+            <div className="max-w-4xl space-y-8">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <Skeleton className="h-8 w-64 mb-2" />
+                        <Skeleton className="h-4 w-96" />
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <Card className="border-zinc-800 bg-zinc-950">
+                        <CardHeader>
+                            <Skeleton className="h-4 w-32" />
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <Skeleton className="aspect-square w-full rounded-md" />
+                            <Skeleton className="h-10 w-full" />
+                        </CardContent>
+                    </Card>
+
+                    <div className="md:col-span-2">
+                        <Card className="border-zinc-800 bg-zinc-950">
+                            <CardContent className="pt-6 space-y-4">
+                                <div>
+                                    <Skeleton className="h-4 w-32 mb-2" />
+                                    <Skeleton className="h-10 w-full" />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <Skeleton className="h-4 w-20 mb-2" />
+                                        <Skeleton className="h-10 w-full" />
+                                    </div>
+                                    <div>
+                                        <Skeleton className="h-4 w-20 mb-2" />
+                                        <Skeleton className="h-10 w-full" />
+                                    </div>
+                                </div>
+                                <div>
+                                    <Skeleton className="h-4 w-36 mb-2" />
+                                    <Skeleton className="h-10 w-full" />
+                                </div>
+                                <div>
+                                    <Skeleton className="h-4 w-32 mb-2" />
+                                    <Skeleton className="h-24 w-full" />
+                                </div>
+                                <div>
+                                    <Skeleton className="h-4 w-32 mb-2" />
+                                    <Skeleton className="h-24 w-full" />
+                                </div>
+                            </CardContent>
+                        </Card>
+                        <Skeleton className="h-10 w-full mt-6" />
+                    </div>
+                </div>
             </div>
         )
     }
