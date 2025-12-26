@@ -98,7 +98,7 @@ export default async function HomePage() {
     supabase
       .from("profile")
       .select(
-        "id, full_name, role_title_es, role_title_en, about_me_es, about_me_en, avatar_url, updated_at, contact_email"
+        "id, full_name, role_title_es, role_title_en, about_me_es, about_me_en, avatar_url, updated_at, contact_email, github_url, linkedin_url, cv_pdf_url"
       )
       .single(),
     supabase
@@ -127,7 +127,7 @@ export default async function HomePage() {
       .order("start_date", { ascending: false }),
     supabase
       .from("certificates")
-      .select("id, title_es, title_en, issuer, issue_date")
+      .select("id, title_es, title_en, issuer, issue_date, image_url, credential_url, category, created_at, display_order")
       .order("issue_date", { ascending: false }),
     supabase
       .from("tech_stack")

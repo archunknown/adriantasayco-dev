@@ -3,10 +3,12 @@
 import { useEffect, useState } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
+import { Github, Linkedin, FileText, Mail, Link as LinkIcon, Download } from "lucide-react"
 import LanguageToggle from "@/components/LanguageToggle"
 import { useTranslation } from "@/context/LanguageContext"
 import { Skeleton } from "@/components/ui/skeleton"
 import SystemModules, { TechStack } from "./SystemModules"
+import SystemCertificates from "./SystemCertificates"
 
 type Profile = {
   id: string
@@ -17,6 +19,9 @@ type Profile = {
   about_me_en: string | null
   avatar_url: string | null
   contact_email: string | null
+  github_url: string | null
+  linkedin_url: string | null
+  cv_pdf_url: string | null
   updated_at: string | null
 }
 
@@ -36,6 +41,11 @@ type Certificate = {
   title_en: string
   issuer: string
   issue_date: string
+  image_url: string | null
+  credential_url: string | null
+  category: string
+  created_at: string
+  display_order: number
 }
 
 type Project = {
@@ -311,6 +321,9 @@ export default function MonitorConsole({
         {/* Tech Modules */}
         <SystemModules modules={techStack} />
 
+        {/* Certificates Section */}
+        <SystemCertificates certificates={certificates} />
+
         <section className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-sm uppercase tracking-[0.4em] text-zinc-500">
@@ -439,31 +452,80 @@ export default function MonitorConsole({
             </div>
           </div>
 
-          <div className="rounded-md border border-zinc-800 bg-zinc-950/60 p-6">
-            <h2 className="text-sm uppercase tracking-[0.4em] text-zinc-500">
-              {labels.knowledge}
+          <div className="rounded-md border border-zinc-800 bg-zinc-950/60 p-6 flex flex-col h-full">
+            <h2 className="text-sm uppercase tracking-[0.4em] text-zinc-500 mb-4">
+              [ CONTACT ]
             </h2>
-            <ul className="mt-4 space-y-2 text-sm text-zinc-400">
-              {isScanning ? (
-                <>
-                  <LogEntrySkeleton />
-                  <LogEntrySkeleton />
-                </>
-              ) : (
-                certificates.map((cert) => {
-                  const title =
-                    activeLang === "es" ? cert.title_es : cert.title_en
-                  return (
-                    <li
-                      key={cert.id}
-                      className="rounded-sm border border-zinc-800 bg-black/40 px-3 py-2"
-                    >
-                      {title} — {cert.issuer}
-                    </li>
-                  )
-                })
+
+            <div className="flex-1 space-y-3">
+              {/* LINKEDIN NODE */}
+              {profile?.linkedin_url && (
+                <a
+                  href={profile.linkedin_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group flex items-center justify-between p-3 rounded-sm border border-zinc-800 bg-black/40 hover:bg-zinc-900 hover:border-blue-500/50 transition-all duration-300"
+                >
+                  <div className="flex items-center gap-3">
+                    <Linkedin className="h-4 w-4 text-zinc-500 group-hover:text-blue-400 transition-colors" />
+                    <span className="text-xs text-zinc-400 group-hover:text-blue-100 font-mono">LINKEDIN_NODE</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.8)]" />
+                    <span className="text-[9px] uppercase text-zinc-600 group-hover:text-blue-400/70">CONNECTED</span>
+                  </div>
+                </a>
               )}
-            </ul>
+
+              {/* GITHUB NODE */}
+              {profile?.github_url && (
+                <a
+                  href={profile.github_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group flex items-center justify-between p-3 rounded-sm border border-zinc-800 bg-black/40 hover:bg-zinc-900 hover:border-purple-500/50 transition-all duration-300"
+                >
+                  <div className="flex items-center gap-3">
+                    <Github className="h-4 w-4 text-zinc-500 group-hover:text-purple-400 transition-colors" />
+                    <span className="text-xs text-zinc-400 group-hover:text-purple-100 font-mono">GITHUB_PROFILE</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.8)]" />
+                    <span className="text-[9px] uppercase text-zinc-600 group-hover:text-purple-400/70">ONLINE</span>
+                  </div>
+                </a>
+              )}
+
+              {/* CV DOWNLOAD */}
+              {profile?.cv_pdf_url && (
+                <a
+                  href={profile.cv_pdf_url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group flex items-center justify-between p-3 rounded-sm border border-zinc-800 bg-black/40 hover:bg-zinc-900 hover:border-green-500/50 transition-all duration-300"
+                >
+                  <div className="flex items-center gap-3">
+                    <FileText className="h-4 w-4 text-zinc-500 group-hover:text-green-400 transition-colors" />
+                    <span className="text-xs text-zinc-400 group-hover:text-green-100 font-mono">DOSSIER_CV</span>
+                  </div>
+                  <Download className="h-3 w-3 text-zinc-600 group-hover:text-green-400" />
+                </a>
+              )}
+
+              {/* EMAIL CIPHER */}
+              {profile?.contact_email && (
+                <a
+                  href={`mailto:${profile.contact_email}`}
+                  className="group flex items-center justify-between p-3 rounded-sm border border-zinc-800 bg-black/40 hover:bg-zinc-900 hover:border-yellow-500/50 transition-all duration-300"
+                >
+                  <div className="flex items-center gap-3">
+                    <Mail className="h-4 w-4 text-zinc-500 group-hover:text-yellow-400 transition-colors" />
+                    <span className="text-xs text-zinc-400 group-hover:text-yellow-100 font-mono">ENCRYPTED_MAIL</span>
+                  </div>
+                  <span className="text-[9px] uppercase text-zinc-600 group-hover:text-yellow-400/70">SEND_KEY</span>
+                </a>
+              )}
+            </div>
           </div>
         </section>
       </div>
