@@ -14,8 +14,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         { name: "Perfil", href: "/admin/profile", icon: UserCircle },
         { name: "Proyectos", href: "/admin/projects", icon: FolderCode },
         { name: "Tecnologías", href: "/admin/tech", icon: Cpu },
-        { name: "Experiencia", href: "/admin/experience", icon: History },
         { name: "Certificados", href: "/admin/certificates", icon: Award },
+        { name: "Experiencia", href: "/admin/experience", icon: History },
     ]
 
     return (
