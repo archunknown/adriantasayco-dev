@@ -1,8 +1,10 @@
 "use client"
 
+
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { compressImage } from "@/lib/utils/image-compression"
+import { deleteImageFromStorage } from "@/lib/utils/storage-cleanup"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
@@ -146,21 +148,7 @@ export default function AdminProjectsPage() {
         return data.publicUrl
     }
 
-    const getStoragePath = (imageUrl: string) => {
-        const marker = "/storage/v1/object/public/portfolio-assets/"
 
-        try {
-            const url = new URL(imageUrl)
-            const index = url.pathname.indexOf(marker)
-            if (index !== -1) {
-                return url.pathname.slice(index + marker.length)
-            }
-        } catch {
-            // La URL puede ser un path directo del bucket.
-        }
-
-        return imageUrl.replace(/^\/+/, "")
-    }
 
     // Lógica de guardado atómico
     async function saveProject(
@@ -174,6 +162,14 @@ export default function AdminProjectsPage() {
 
             if (imageFile) {
                 imageUrl = await uploadProjectImage(imageFile)
+                // If editing and we have a new image, delete the old one
+                if (
+                    editingProject &&
+                    editingProject.image_url &&
+                    editingProject.image_url !== imageUrl
+                ) {
+                    await deleteImageFromStorage(supabase, editingProject.image_url)
+                }
             }
 
             if (!imageUrl) {
@@ -258,17 +254,8 @@ export default function AdminProjectsPage() {
                 .eq("id", project.id)
             if (deleteError) throw deleteError
 
-            const imagePath = getStoragePath(project.image_url)
-            if (imagePath) {
-                const { error: storageError } = await supabase.storage
-                    .from("portfolio-assets")
-                    .remove([imagePath])
-                if (storageError) {
-                    toast.error(
-                        "Nodo eliminado, pero fallo al borrar la imagen: " +
-                        storageError.message
-                    )
-                }
+            if (project.image_url) {
+                await deleteImageFromStorage(supabase, project.image_url)
             }
 
             toast.success("Nodo eliminado correctamente")

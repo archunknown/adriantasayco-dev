@@ -17,6 +17,7 @@ import { Loader2, Plus, Award, Trash2, Edit, ExternalLink } from "lucide-react"
 import type { Database } from "@/types/database.types"
 import { Skeleton } from "@/components/ui/skeleton"
 import { compressImage } from "@/lib/utils/image-compression"
+import { deleteImageFromStorage } from "@/lib/utils/storage-cleanup"
 import Image from "next/image"
 
 type Certificate = Database["public"]["Tables"]["certificates"]["Row"]
@@ -112,6 +113,10 @@ export default function AdminCertificatesPage() {
 
             if (imageFile) {
                 imageUrl = await uploadCertImage(imageFile)
+                // If editing and we have a new image, delete the old one
+                if (editingCert && editingCert.image_url && editingCert.image_url !== imageUrl) {
+                    await deleteImageFromStorage(supabase, editingCert.image_url)
+                }
             }
 
             const payload = {
@@ -157,8 +162,10 @@ export default function AdminCertificatesPage() {
 
             if (error) throw error
 
-            // Create helper to extract path from URL if needed to delete file from storage
-            // keeping it simple for now, DB delete first. images can be orphaned for safety or cleaned up later.
+            // Cleanup storage
+            if (cert.image_url) {
+                await deleteImageFromStorage(supabase, cert.image_url)
+            }
 
             toast.success("Certificado eliminado")
             fetchCertificates()
