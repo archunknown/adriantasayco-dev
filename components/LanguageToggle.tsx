@@ -12,32 +12,38 @@ export default function LanguageToggle() {
     : "Switch language to Spanish"
 
   return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={isEnglish}
-      aria-label={ariaLabel}
-      onClick={toggleLang}
-      disabled={!isMounted}
+    <div
       className={cn(
-        "relative inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-black/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.35em] text-zinc-500 transition",
+        "relative flex items-center rounded-full border border-zinc-800 bg-black/40 p-1 shadow-sm transition-all",
         !isMounted && "cursor-not-allowed opacity-60"
       )}
     >
-      <span className={cn(isEnglish ? "text-zinc-500" : "text-green-400")}>
+      <button
+        type="button"
+        onClick={() => !isEnglish && toggleLang()}
+        disabled={!isMounted}
+        className={cn(
+          "relative z-10 flex h-7 min-w-[3rem] items-center justify-center rounded-full text-[10px] font-bold transition-all duration-300",
+          !isEnglish
+            ? "bg-zinc-800 text-green-400 shadow-[0_0_10px_rgba(34,197,94,0.2)]"
+            : "text-zinc-500 hover:text-zinc-300"
+        )}
+      >
         ES
-      </span>
-      <div className="relative h-4 w-10 rounded-full border border-zinc-800 bg-zinc-950">
-        <span
-          className={cn(
-            "absolute top-1/2 h-3 w-3 -translate-y-1/2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)] transition",
-            isEnglish ? "translate-x-6" : "translate-x-1"
-          )}
-        />
-      </div>
-      <span className={cn(isEnglish ? "text-green-400" : "text-zinc-500")}>
+      </button>
+      <button
+        type="button"
+        onClick={() => isEnglish && toggleLang()}
+        disabled={!isMounted}
+        className={cn(
+          "relative z-10 flex h-7 min-w-[3rem] items-center justify-center rounded-full text-[10px] font-bold transition-all duration-300",
+          isEnglish
+            ? "bg-zinc-800 text-green-400 shadow-[0_0_10px_rgba(34,197,94,0.2)]"
+            : "text-zinc-500 hover:text-zinc-300"
+        )}
+      >
         EN
-      </span>
-    </button>
+      </button>
+    </div>
   )
 }

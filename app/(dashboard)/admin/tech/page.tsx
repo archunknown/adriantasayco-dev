@@ -11,13 +11,22 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
-import TechForm, { type TechFormValues } from "@/components/dashboard/TechForm"
+import TechForm, { type TechFormValues, TECH_CATEGORIES } from "@/components/dashboard/TechForm"
 import { toast } from "sonner"
 import { Loader2, Plus, Cpu, Trash2, Edit, Layers } from "lucide-react"
 import type { Database } from "@/types/database.types"
 import { Skeleton } from "@/components/ui/skeleton"
 
 type TechStack = Database["public"]["Tables"]["tech_stack"]["Row"]
+
+const DEFAULT_TECH_CATEGORY: TechFormValues["category"] = TECH_CATEGORIES[0]
+
+const isTechCategory = (value: string): value is TechFormValues["category"] => {
+    return TECH_CATEGORIES.includes(value as TechFormValues["category"])
+}
+
+const normalizeCategory = (value: string): TechFormValues["category"] =>
+    isTechCategory(value) ? value : DEFAULT_TECH_CATEGORY
 
 export default function AdminTechPage() {
     const [techs, setTechs] = useState<TechStack[]>([])
@@ -30,7 +39,7 @@ export default function AdminTechPage() {
     const emptyFormValues: TechFormValues = useMemo(
         () => ({
             name: "",
-            category: "FRONTEND",
+            category: DEFAULT_TECH_CATEGORY,
             icon_slug: "",
         }),
         []
@@ -41,7 +50,7 @@ export default function AdminTechPage() {
 
         return {
             name: editingTech.name,
-            category: editingTech.category,
+            category: normalizeCategory(editingTech.category),
             icon_slug: editingTech.icon_slug,
         }
     }, [editingTech, emptyFormValues])
@@ -212,28 +221,38 @@ export default function AdminTechPage() {
                     if (!open) setEditingTech(null)
                 }}
             >
-                <DialogContent className="border-zinc-800 bg-zinc-950 text-zinc-100">
-                    <DialogHeader>
-                        <DialogTitle>
-                            {editingTech
-                                ? "Configurar Módulo"
-                                : "Instalar Nuevo Paquete"}
-                        </DialogTitle>
-                        <DialogDescription className="text-zinc-500">
-                            Define los metadatos del módulo para el panel de control.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <TechForm
-                        key={editingTech?.id ?? "new"}
-                        initialValues={formValues}
-                        onSave={saveTech}
-                        onCancel={() => setDialogOpen(false)}
-                        submitLabel={
-                            editingTech
-                                ? "Guardar Cambios"
-                                : "Instalar"
-                        }
-                    />
+                <DialogContent className="border-zinc-800 bg-[#09090b] text-zinc-100 sm:max-w-xl p-0 overflow-hidden shadow-2xl shadow-black/80">
+                    <div className="p-6">
+                        <DialogHeader className="border-b border-zinc-900/50 pb-6 mb-6">
+                            <DialogTitle className="text-xl font-medium tracking-tight text-white flex items-center gap-2">
+                                {editingTech ? (
+                                    <>
+                                        <div className="h-2 w-2 rounded-full bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.5)]" />
+                                        Configurar Módulo
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="h-2 w-2 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
+                                        Instalar Nuevo Paquete
+                                    </>
+                                )}
+                            </DialogTitle>
+                            <DialogDescription className="text-zinc-500 text-sm">
+                                Gestiona las dependencias y tecnologías visibles en el portfolio.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <TechForm
+                            key={editingTech?.id ?? "new"}
+                            initialValues={formValues}
+                            onSave={saveTech}
+                            onCancel={() => setDialogOpen(false)}
+                            submitLabel={
+                                editingTech
+                                    ? "Guardar Cambios"
+                                    : "Instalar"
+                            }
+                        />
+                    </div>
                 </DialogContent>
             </Dialog>
         </div>
