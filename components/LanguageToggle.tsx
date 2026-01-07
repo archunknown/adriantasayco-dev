@@ -23,7 +23,7 @@ export default function LanguageToggle() {
         onClick={() => !isEnglish && toggleLang()}
         disabled={!isMounted}
         className={cn(
-          "relative z-10 flex h-7 min-w-[3rem] items-center justify-center rounded-full text-[10px] font-bold transition-all duration-300",
+          "relative z-10 flex h-7 min-w-12 items-center justify-center rounded-full text-[10px] font-bold transition-all duration-300",
           !isEnglish
             ? "bg-zinc-800 text-green-400 shadow-[0_0_10px_rgba(34,197,94,0.2)]"
             : "text-zinc-500 hover:text-zinc-300"
@@ -36,7 +36,7 @@ export default function LanguageToggle() {
         onClick={() => isEnglish && toggleLang()}
         disabled={!isMounted}
         className={cn(
-          "relative z-10 flex h-7 min-w-[3rem] items-center justify-center rounded-full text-[10px] font-bold transition-all duration-300",
+          "relative z-10 flex h-7 min-w-12 items-center justify-center rounded-full text-[10px] font-bold transition-all duration-300",
           isEnglish
             ? "bg-zinc-800 text-green-400 shadow-[0_0_10px_rgba(34,197,94,0.2)]"
             : "text-zinc-500 hover:text-zinc-300"

@@ -35,7 +35,7 @@ export default function SystemCertificates({ certificates }: SystemCertificatesP
                         className="group relative flex overflow-hidden rounded-sm border border-zinc-800 bg-zinc-950/40 hover:border-zinc-700 transition-all duration-300"
                     >
                         {/* Image / Icon Section */}
-                        <div className="relative w-24 md:w-32 bg-zinc-900/50 flex items-center justify-center flex-shrink-0 border-r border-zinc-800/50">
+                        <div className="relative w-24 md:w-32 bg-zinc-900/50 flex items-center justify-center shrink-0 border-r border-zinc-800/50">
                             {cert.image_url ? (
                                 <Image
                                     src={cert.image_url}
