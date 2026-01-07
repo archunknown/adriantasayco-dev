@@ -302,9 +302,9 @@ export default function MonitorConsole({
         {/* RIGHT COLUMN (Projects, Logs, Comms) - Spans 8 columns */}
         <div className="col-span-1 lg:col-span-7 flex flex-col gap-4 min-h-0">
           {/* DEPLOYED NODES (Projects) */}
-          <div className="flex-1 border border-green-500/30 bg-green-500/5 p-1 relative min-h-0 overflow-y-auto scrollbar-hide">
+          <div className="flex-1 border border-green-500/30 bg-green-500/5 p-1 relative min-h-0 overflow-hidden">
             <div className="absolute top-0 right-0 bg-green-500 text-black px-1 text-[10px]">DEPLOYED_NODES</div>
-            <div className="h-full border border-green-500/20 mt-4 p-2">
+            <div className="h-full border border-green-500/20 mt-4 p-2 overflow-y-auto scrollbar-hide">
               <DeployedNodes projects={projects} />
             </div>
           </div>

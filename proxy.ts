@@ -1,7 +1,7 @@
+// Archivo: proxy.ts
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-// El nombre de la función DEBE coincidir con el nombre del archivo en Next 16+
 export async function proxy(request: NextRequest) {
     let response = NextResponse.next({
         request: {
@@ -32,7 +32,6 @@ export async function proxy(request: NextRequest) {
 
     const { data: { user } } = await supabase.auth.getUser()
 
-    // Protección de rutas: Lógica idéntica, contexto actualizado
     if (request.nextUrl.pathname.startsWith('/admin') && !user) {
         return NextResponse.redirect(new URL('/login', request.url))
     }
@@ -45,5 +44,7 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-    matcher: ['/admin/:path*', '/login'],
+    matcher: [
+        '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    ],
 }

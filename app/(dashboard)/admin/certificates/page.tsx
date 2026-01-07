@@ -229,7 +229,7 @@ export default function AdminCertificatesPage() {
 
                                     <div className="flex items-center gap-2 mt-4 justify-end">
                                         {cert.credential_url && (
-                                            <Button variant="ghost" size="icon" className="h-7 w-7 text-zinc-500 hover:text-green-400" asChild>
+                                            <Button variant="ghost" size="icon" className="h-7 w-7 border border-green-500/40 text-green-400/80 shadow-[0_0_12px_rgba(34,197,94,0.35)] transition-shadow hover:border-green-400 hover:text-green-300 hover:bg-green-500/10 hover:shadow-[0_0_18px_rgba(34,197,94,0.6)]" asChild>
                                                 <a href={cert.credential_url} target="_blank" rel="noreferrer">
                                                     <ExternalLink className="h-3.5 w-3.5" />
                                                 </a>
