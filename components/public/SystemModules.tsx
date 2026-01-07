@@ -48,83 +48,58 @@ const generateVersion = (name: string) => {
 export default function SystemModules({ modules }: SystemModulesProps) {
     const [activeTab, setActiveTab] = useState("ALL")
 
-    // Get unique categories and normalize them (optional: hardcode preferred order)
+    // Get unique categories
     const categories = ["ALL", ...Array.from(new Set(modules.map(m => m.category.toUpperCase())))]
 
+    // Filter modules
     const filteredModules = activeTab === "ALL"
         ? modules
         : modules.filter(m => m.category.toUpperCase() === activeTab)
 
-    return (
-        <section className="space-y-4 py-6">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <h2 className="text-sm uppercase tracking-[0.4em] text-zinc-500">
-                    [ SYSTEM_MODULES // INSTALLED_PACKAGES ]
-                </h2>
 
-                {/* Tabs */}
-                <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
-                    {categories.map(cat => (
-                        <button
-                            key={cat}
-                            onClick={() => setActiveTab(cat)}
-                            className={`px-3 py-1 text-[10px] font-mono border transition-all duration-300 ${activeTab === cat
-                                ? "border-green-500/50 bg-green-500/10 text-green-400"
-                                : "border-zinc-800 bg-zinc-950/40 text-zinc-600 hover:border-zinc-700 hover:text-zinc-400"
-                                }`}
-                        >
-                            {cat}
-                        </button>
-                    ))}
-                </div>
+
+    return (
+        <div className="h-full w-full flex flex-col">
+            {/* Tabs Header */}
+            <div className="flex gap-1 overflow-x-auto pb-2 scrollbar-hide shrink-0 mb-2 border-b border-green-500/20">
+                {categories.map(cat => (
+                    <button
+                        key={cat}
+                        onClick={() => setActiveTab(cat)}
+                        className={`px-2 py-0.5 text-[8px] font-mono border transition-all duration-300 uppercase whitespace-nowrap ${activeTab === cat
+                            ? "border-green-500 bg-green-500/20 text-green-400"
+                            : "border-green-500/30 text-green-500/50 hover:border-green-500/60 hover:text-green-500/80"
+                            }`}
+                    >
+                        {cat}
+                    </button>
+                ))}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Modules Grid */}
+            <div className="grid grid-cols-3 gap-2 content-start overflow-y-auto scrollbar-hide">
                 {filteredModules.map((tech) => {
                     const version = generateVersion(tech.name)
-
                     return (
                         <div
                             key={tech.id}
-                            className="group relative overflow-hidden rounded-sm border border-zinc-800 bg-zinc-950/40 hover:border-green-500/50 hover:bg-zinc-900/60 hover:shadow-[0_0_15px_rgba(34,197,94,0.15)] transition-all duration-300"
+                            className="group relative flex flex-col items-center justify-center p-2 border border-green-500/20 bg-green-500/5 hover:bg-green-500/20 transition-all duration-300 backdrop-blur-sm min-h-[80px]"
                         >
-                            <div className="flex items-center gap-4 p-4">
-                                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded bg-black/50 text-zinc-600 transition-all duration-300 group-hover:text-green-400 group-hover:shadow-[0_0_8px_rgba(34,197,94,0.3)]">
-                                    <TechIcon slug={tech.icon_slug} name={tech.name} />
-                                </div>
+                            <TechIcon slug={tech.icon_slug} name={tech.name} />
+                            <span className="mt-1 font-mono text-[9px] font-bold uppercase text-green-500/70 group-hover:text-green-400 truncate w-full text-center">
+                                {tech.name}
+                            </span>
+                            <span className="text-[8px] text-green-500/40 group-hover:text-green-500/60 transform scale-90">
+                                {version.split(' ')[0]}
+                            </span>
 
-                                <div className="flex flex-col space-y-1 flex-1 min-w-0">
-                                    <div className="flex items-baseline justify-between w-full">
-                                        <span className="font-mono text-xs font-bold uppercase tracking-wider text-zinc-400 group-hover:text-green-100 transition-colors truncate">
-                                            {tech.name}
-                                        </span>
-                                        <span className="font-mono text-[9px] text-zinc-600 group-hover:text-green-500/60 ml-2 shrink-0">
-                                            {version}
-                                        </span>
-                                    </div>
-
-                                    <div className="mt-1.5 space-y-1">
-                                        <div className="h-0.5 w-full bg-zinc-800/80 overflow-hidden rounded-full">
-                                            <div className="h-full w-[85%] bg-zinc-600 group-hover:bg-green-500 transition-all duration-500 ease-out" />
-                                        </div>
-                                        <div className="flex justify-end">
-                                            <span className="font-mono text-[8px] uppercase text-zinc-700 group-hover:text-green-500/50 tracking-widest">
-                                                USAGE_LOAD: HEAVY
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            {/* Corner accents */}
+                            <div className="absolute top-0 left-0 w-1 h-1 border-t border-l border-green-500/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            <div className="absolute bottom-0 right-0 w-1 h-1 border-b border-r border-green-500/50 opacity-0 group-hover:opacity-100 transition-opacity" />
                         </div>
                     )
                 })}
             </div>
-
-            <div className="mt-2 flex justify-end">
-                <span className="text-[9px] font-mono text-zinc-700">
-                    TOTAL_MODULES_LOADED: {filteredModules.length}
-                </span>
-            </div>
-        </section>
+        </div>
     )
 }
