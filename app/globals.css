@@ -119,7 +119,53 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .bg-grid-pattern {
+    background-size: 40px 40px;
+    background-image: linear-gradient(to right, rgba(74, 222, 128, 0.1) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(74, 222, 128, 0.1) 1px, transparent 1px);
+  }
+
+  .animate-scanline {
+    animation: scanline 8s linear infinite;
+  }
+
+  .animate-flicker {
+    animation: flicker 0.15s infinite;
+  }
+
+  .text-terminal-green {
+    color: #4ade80;
+    text-shadow: 0 0 5px rgba(74, 222, 128, 0.5);
+  }
+}
+
+@keyframes scanline {
+  0% {
+    background-position: 0% 0%;
+  }
+
+  100% {
+    background-position: 0% 100%;
+  }
+}
+
+@keyframes flicker {
+  0% {
+    opacity: 0.9;
+  }
+
+  50% {
+    opacity: 1.0;
+  }
+
+  100% {
+    opacity: 0.9;
   }
 }
