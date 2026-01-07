@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { Github, Linkedin, FileText, Mail, Link as LinkIcon, Download } from "lucide-react"
+import { Github, Linkedin, FileText, Mail, Link as LinkIcon, Download, FileDown } from "lucide-react"
 import LanguageToggle from "@/components/LanguageToggle"
 import { useTranslation } from "@/context/LanguageContext"
 import { Skeleton } from "@/components/ui/skeleton"
 import SystemModules, { TechStack } from "./SystemModules"
-import SystemCertificates from "./SystemCertificates"
+import DeployedNodes from "./DeployedNodes"
+import CredentialLogs from "./CredentialLogs"
+import CommsLink from "./CommsLink"
 
 type Profile = {
   id: string
@@ -124,28 +126,12 @@ export default function MonitorConsole({
   const { lang, isMounted } = useTranslation()
   const activeLang = isMounted ? lang : "es"
   const router = useRouter()
+  const [time, setTime] = useState<Date | null>(null)
+  const [power, setPower] = useState(98.7)
+
   const [headerClicks, setHeaderClicks] = useState(0)
-  const [isScanning, setIsScanning] = useState(true)
 
-  // Simulated scanning effect for industrial aesthetic
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setIsScanning(false)
-    }, 800)
-    return () => window.clearTimeout(timer)
-  }, [])
-
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.altKey && event.key.toLowerCase() === "a") {
-        router.push("/login")
-      }
-    }
-
-    window.addEventListener("keydown", onKeyDown)
-    return () => window.removeEventListener("keydown", onKeyDown)
-  }, [router])
-
+  // Admin Easter Egg Logic
   useEffect(() => {
     if (headerClicks >= 5) {
       router.push("/login")
@@ -160,6 +146,34 @@ export default function MonitorConsole({
 
     return () => window.clearTimeout(timer)
   }, [headerClicks, router])
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.altKey && event.key.toLowerCase() === "a") {
+        router.push("/login")
+      }
+    }
+    window.addEventListener("keydown", onKeyDown)
+    return () => window.removeEventListener("keydown", onKeyDown)
+  }, [router])
+
+  // Clock & Power Fluctuation
+  useEffect(() => {
+    const updateTime = () => setTime(new Date())
+    updateTime()
+    const timer = setInterval(() => {
+      updateTime()
+      // Randomly fluctuate power slightly
+      if (Math.random() > 0.9) {
+        setPower(prev => +(98.0 + Math.random()).toFixed(1))
+      }
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [])
+
+  const timeLabel = time
+    ? time.toISOString().replace("T", " // ").split(".")[0]
+    : "--"
 
   const labels =
     activeLang === "es"
@@ -201,334 +215,121 @@ export default function MonitorConsole({
     activeLang === "es" ? profile?.about_me_es : profile?.about_me_en
 
   return (
-    <div className="relative min-h-screen bg-black text-zinc-100">
-      <div
-        className="pointer-events-none fixed inset-0 z-0 opacity-10"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(0deg, rgba(34,197,94,0.08), rgba(34,197,94,0.08) 1px, transparent 1px, transparent 3px)",
-        }}
-      />
+    <div className="flex h-full flex-col p-4 md:p-6 lg:p-8 font-mono text-xs md:text-sm text-green-500 overflow-hidden">
+      {/* HEADER SECTION (To be implemented in Phase 2) */}
+      <header className="flex-none border-b border-green-500/30 pb-2 mb-4 flex justify-between items-end">
+        <div className="flex gap-4 items-center">
+          <button onClick={() => setHeaderClicks(prev => prev + 1)} className="hover:text-green-400 select-none">
+            <span>SYSTEM_TIME: {timeLabel} EST</span>
+          </button>
+        </div>
+        <div className="flex gap-4 items-center">
+          <LanguageToggle />
+          <span className="animate-pulse">GRID_POWER: {power}% - STABLE</span>
+        </div>
+      </header>
 
-      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-10 px-6 py-12 font-mono">
-        <header
-          className="flex flex-wrap items-center justify-between gap-4"
-          onClick={() => setHeaderClicks((count) => count + 1)}
-        >
-          <div className="space-y-2">
-            <p className="text-xs uppercase tracking-[0.4em] text-zinc-500">
-              {labels.monitor}
-            </p>
-            {isScanning ? (
-              <>
-                <Skeleton className="h-9 w-64" />
-                <Skeleton className="h-5 w-40" />
-              </>
-            ) : (
-              <>
-                <h1 className="text-3xl font-semibold text-green-400">
-                  {fullName}
-                </h1>
-                <p className="text-sm text-zinc-400">
-                  {roleTitle ?? labels.roleFallback}
-                </p>
-              </>
-            )}
-          </div>
-          <div className="flex items-center gap-4">
-            {/* Avatar with cache busting */}
-            {isScanning ? (
-              <Skeleton className="h-12 w-12 rounded-full" />
-            ) : (
-              <div className="relative h-12 w-12 overflow-hidden rounded-full border border-zinc-800 bg-zinc-900">
-                {profile?.avatar_url ? (
-                  <Image
-                    src={`${profile.avatar_url}${profile.updated_at ? `?t=${new Date(profile.updated_at).getTime()}` : ""}`}
-                    alt={profile.full_name}
-                    fill
-                    className="object-cover"
-                    unoptimized
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-sm font-bold text-green-400">
-                    {profile?.full_name?.charAt(0) ?? "?"}
-                  </div>
-                )}
+      {/* MAIN GRID CONTENT */}
+      <main className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 min-h-0">
+        {/* LEFT COLUMN (Profile & Modules) - Spans 4 columns */}
+        <div className="col-span-1 lg:col-span-5 flex flex-col gap-4 min-h-0">
+          {/* OPERATOR PROFILE */}
+          <div className="flex-none border border-green-500/30 bg-green-500/5 p-1 relative group">
+            <div className="absolute top-0 left-0 bg-green-500 text-black px-1 text-[10px]">OPERATOR_PROFILE</div>
+            <div className="h-48 flex items-center p-4 gap-6 bg-black/40">
+              {/* Avatar Box */}
+              <div className="relative h-32 w-32 shrink-0 border border-green-500/50 p-1">
+                <div className="h-full w-full relative overflow-hidden bg-green-500/10">
+                  {profile?.avatar_url ? (
+                    <Image
+                      src={profile.avatar_url}
+                      alt="Operator"
+                      fill
+                      className="object-cover contrast-125 saturate-0 hover:saturate-100 transition-all duration-500 brightness-90"
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="h-full w-full flex items-center justify-center text-4xl font-bold bg-green-900/20 text-green-500">
+                      {fullName.charAt(0)}
+                    </div>
+                  )}
+                  {/* Scanline on Avatar */}
+                  <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/50 to-transparent bg-size-[100%_4px] pointer-events-none opacity-50" />
+                </div>
+                <div className="absolute -bottom-3 -right-3 h-2 w-2 bg-green-500 animate-pulse" />
               </div>
-            )}
-            <LanguageToggle />
-          </div>
-        </header>
 
-        {/* Email / Contact Line */}
-        {profile?.contact_email && !isScanning && (
-          <div className="flex items-center gap-2 border-l-2 border-green-500/50 bg-green-500/5 px-4 py-2 text-xs text-green-400">
-            <span className="opacity-50">$</span>
-            <span className="opacity-70">send_signal</span>
-            <a
-              href={`mailto:${profile.contact_email}`}
-              className="underline decoration-green-500/30 underline-offset-4 hover:text-green-300 hover:decoration-green-400"
-            >
-              {profile.contact_email}
-            </a>
-          </div>
-        )}
+              {/* Text Info */}
+              <div className="space-y-2 text-xs">
+                <div className="flex flex-col">
+                  <span className="text-green-500/50 text-[10px] uppercase">NAME:</span>
+                  <span className="text-lg font-bold tracking-wider">{fullName}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-green-500/50 text-[10px] uppercase">ROLE:</span>
+                  <span>{roleTitle ?? "CYBERNETIC ENGINEER"}</span>
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-green-500/50 text-[10px] uppercase">STATUS:</span>
+                  <span className="animate-pulse text-green-400">ONLINE</span>
+                </div>
+                <div className="animate-flicker text-[10px] text-green-500/70 mt-2">
+                  &gt; TEXT FLICKERS...
+                </div>
 
-        <section className="grid gap-4 rounded-md border border-zinc-800 bg-zinc-950/60 p-6">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <p className="text-xs uppercase tracking-[0.4em] text-zinc-500">
-                {labels.systemHealth}
-              </p>
-              {isScanning ? (
-                <div className="mt-2 space-y-2">
-                  <Skeleton className="h-4 w-full max-w-md" />
-                  <Skeleton className="h-4 w-3/4 max-w-md" />
-                </div>
-              ) : (
-                <p className="text-sm text-zinc-400">
-                  {about ?? labels.telemetryFallback}
-                </p>
-              )}
-            </div>
-            {isScanning ? (
-              <MetricsSkeleton />
-            ) : (
-              <div className="grid grid-cols-3 gap-4 text-xs text-zinc-400">
-                <div className="space-y-1">
-                  <p className="uppercase tracking-[0.3em] text-zinc-500">
-                    Uptime
-                  </p>
-                  <p className="text-green-400">99.9%</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="uppercase tracking-[0.3em] text-zinc-500">
-                    Latency
-                  </p>
-                  <p className="text-green-400">&lt; 30ms</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="uppercase tracking-[0.3em] text-zinc-500">
-                    Status
-                  </p>
-                  <p className="text-green-400">Operational</p>
-                </div>
+                {/* CV Download Button */}
+                <a
+                  href={profile?.cv_pdf_url ?? "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`flex items-center gap-2 mt-2 px-2 py-1 border border-green-500/30 text-[10px] uppercase font-bold transition-colors w-fit ${!profile?.cv_pdf_url ? 'opacity-50 cursor-not-allowed text-green-500/50' : 'text-green-400 hover:bg-green-500 hover:text-black'}`}
+                >
+                  <FileDown className="h-3 w-3" /> {profile?.cv_pdf_url ? "DOWNLOAD_CV // .PDF" : "CV_NOT_UPLOADED"}
+                </a>
               </div>
-            )}
-          </div>
-        </section>
-
-        {/* Tech Modules */}
-        <SystemModules modules={techStack} />
-
-        {/* Certificates Section */}
-        <SystemCertificates certificates={certificates} />
-
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm uppercase tracking-[0.4em] text-zinc-500">
-              {labels.nodes}
-            </h2>
-            <span className="text-xs text-zinc-500">
-              {isScanning ? (
-                <Skeleton className="h-4 w-16 inline-block" />
-              ) : (
-                `${projects.length} ${labels.active}`
-              )}
-            </span>
-          </div>
-          <div className="grid gap-6 md:grid-cols-2">
-            {isScanning ? (
-              <>
-                <ProjectCardSkeleton />
-                <ProjectCardSkeleton />
-              </>
-            ) : (
-              projects.map((project, index) => {
-                const title =
-                  activeLang === "es" ? project.title_es : project.title_en
-                const description =
-                  activeLang === "es"
-                    ? project.description_es
-                    : project.description_en
-                const techStack = project.project_techs
-                  .map((entry) => entry.tech_stack?.name)
-                  .filter((value): value is string => Boolean(value))
-
-                return (
-                  <div
-                    key={project.id}
-                    className="overflow-hidden rounded-md border border-zinc-800 bg-zinc-950/60"
-                  >
-                    <div className="relative h-48 w-full bg-zinc-950">
-                      {project.image_url ? (
-                        <Image
-                          src={project.image_url}
-                          alt={title}
-                          fill
-                          priority={index < 2}
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                          unoptimized={project.image_url.includes("placehold.co")}
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-full items-center justify-center text-xs uppercase tracking-[0.3em] text-zinc-600">
-                          {labels.noImage}
-                        </div>
-                      )}
-                    </div>
-                    <div className="space-y-3 p-5">
-                      <div>
-                        <h3 className="text-lg font-semibold text-green-400">
-                          {title}
-                        </h3>
-                        <p className="text-sm text-zinc-400">{description}</p>
-                      </div>
-                      <div className="space-y-2">
-                        <p className="text-xs uppercase tracking-[0.4em] text-zinc-500">
-                          {labels.dependencies}
-                        </p>
-                        <div className="flex flex-wrap gap-2 text-xs text-zinc-400">
-                          {techStack.length > 0 ? (
-                            techStack.map((tech) => (
-                              <span
-                                key={tech}
-                                className="rounded-sm border border-zinc-800 bg-black/40 px-2 py-1"
-                              >
-                                {tech}
-                              </span>
-                            ))
-                          ) : (
-                            <span className="text-zinc-600">
-                              {labels.noDependencies}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })
-            )}
-          </div>
-        </section>
-
-        <section className="grid gap-4 lg:grid-cols-[2fr_1fr]">
-          <div className="rounded-md border border-zinc-800 bg-zinc-950/60 p-6">
-            <h2 className="text-sm uppercase tracking-[0.4em] text-zinc-500">
-              {labels.logs}
-            </h2>
-            <div className="mt-4 space-y-3 text-sm text-zinc-400">
-              {isScanning ? (
-                <>
-                  <LogEntrySkeleton />
-                  <LogEntrySkeleton />
-                  <LogEntrySkeleton />
-                </>
-              ) : (
-                experience.map((log) => {
-                  const timestamp = new Date(log.start_date)
-                    .toISOString()
-                    .slice(0, 10)
-                  const role =
-                    activeLang === "es" ? log.role_es : log.role_en
-                  const description =
-                    activeLang === "es"
-                      ? log.description_es
-                      : log.description_en
-                  return (
-                    <div
-                      key={log.id}
-                      className="rounded-sm border border-zinc-800 bg-black/40 px-3 py-2"
-                    >
-                      <span className="text-green-400">
-                        [{timestamp}]
-                      </span>{" "}
-                      {labels.event}: {role} @ {log.company_name} - {description}
-                    </div>
-                  )
-                })
-              )}
             </div>
           </div>
 
-          <div className="rounded-md border border-zinc-800 bg-zinc-950/60 p-6 flex flex-col h-full">
-            <h2 className="text-sm uppercase tracking-[0.4em] text-zinc-500 mb-4">
-              [ CONTACT ]
-            </h2>
-
-            <div className="flex-1 space-y-3">
-              {/* LINKEDIN NODE */}
-              {profile?.linkedin_url && (
-                <a
-                  href={profile.linkedin_url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="group flex items-center justify-between p-3 rounded-sm border border-zinc-800 bg-black/40 hover:bg-zinc-900 hover:border-blue-500/50 transition-all duration-300"
-                >
-                  <div className="flex items-center gap-3">
-                    <Linkedin className="h-4 w-4 text-zinc-500 group-hover:text-blue-400 transition-colors" />
-                    <span className="text-xs text-zinc-400 group-hover:text-blue-100 font-mono">LINKEDIN_NODE</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.8)]" />
-                    <span className="text-[9px] uppercase text-zinc-600 group-hover:text-blue-400/70">CONNECTED</span>
-                  </div>
-                </a>
-              )}
-
-              {/* GITHUB NODE */}
-              {profile?.github_url && (
-                <a
-                  href={profile.github_url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="group flex items-center justify-between p-3 rounded-sm border border-zinc-800 bg-black/40 hover:bg-zinc-900 hover:border-purple-500/50 transition-all duration-300"
-                >
-                  <div className="flex items-center gap-3">
-                    <Github className="h-4 w-4 text-zinc-500 group-hover:text-purple-400 transition-colors" />
-                    <span className="text-xs text-zinc-400 group-hover:text-purple-100 font-mono">GITHUB_PROFILE</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.8)]" />
-                    <span className="text-[9px] uppercase text-zinc-600 group-hover:text-purple-400/70">ONLINE</span>
-                  </div>
-                </a>
-              )}
-
-              {/* CV DOWNLOAD */}
-              {profile?.cv_pdf_url && (
-                <a
-                  href={profile.cv_pdf_url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="group flex items-center justify-between p-3 rounded-sm border border-zinc-800 bg-black/40 hover:bg-zinc-900 hover:border-green-500/50 transition-all duration-300"
-                >
-                  <div className="flex items-center gap-3">
-                    <FileText className="h-4 w-4 text-zinc-500 group-hover:text-green-400 transition-colors" />
-                    <span className="text-xs text-zinc-400 group-hover:text-green-100 font-mono">DOSSIER_CV</span>
-                  </div>
-                  <Download className="h-3 w-3 text-zinc-600 group-hover:text-green-400" />
-                </a>
-              )}
-
-              {/* EMAIL CIPHER */}
-              {profile?.contact_email && (
-                <a
-                  href={`mailto:${profile.contact_email}`}
-                  className="group flex items-center justify-between p-3 rounded-sm border border-zinc-800 bg-black/40 hover:bg-zinc-900 hover:border-yellow-500/50 transition-all duration-300"
-                >
-                  <div className="flex items-center gap-3">
-                    <Mail className="h-4 w-4 text-zinc-500 group-hover:text-yellow-400 transition-colors" />
-                    <span className="text-xs text-zinc-400 group-hover:text-yellow-100 font-mono">ENCRYPTED_MAIL</span>
-                  </div>
-                  <span className="text-[9px] uppercase text-zinc-600 group-hover:text-yellow-400/70">SEND_KEY</span>
-                </a>
-              )}
+          {/* SYSTEM MODULES */}
+          <div className="flex-1 border border-green-500/30 bg-green-500/5 p-1 relative min-h-0 overflow-hidden">
+            <div className="absolute top-0 left-0 bg-green-500 text-black px-1 text-[10px]">SYSTEM_MODULES // INSTALLED_PACKAGES</div>
+            <div className="h-full border border-green-500/20 mt-4 flex items-center justify-center p-2 overflow-y-auto scrollbar-hide">
+              <SystemModules modules={techStack} />
             </div>
           </div>
-        </section>
-      </div>
+        </div>
+
+        {/* RIGHT COLUMN (Projects, Logs, Comms) - Spans 8 columns */}
+        <div className="col-span-1 lg:col-span-7 flex flex-col gap-4 min-h-0">
+          {/* DEPLOYED NODES (Projects) */}
+          <div className="flex-1 border border-green-500/30 bg-green-500/5 p-1 relative min-h-0 overflow-y-auto scrollbar-hide">
+            <div className="absolute top-0 right-0 bg-green-500 text-black px-1 text-[10px]">DEPLOYED_NODES</div>
+            <div className="h-full border border-green-500/20 mt-4 p-2">
+              <DeployedNodes projects={projects} />
+            </div>
+          </div>
+
+          {/* CREDENTIAL LOGS */}
+          <div className="h-1/4 border border-green-500/30 bg-green-500/5 p-1 relative">
+            <div className="absolute top-0 left-0 bg-green-500 text-black px-1 text-[10px]">CREDENTIAL_LOGS // CERTIFICATIONS</div>
+            <div className="h-full border border-green-500/20 mt-4">
+              <CredentialLogs certificates={certificates} />
+            </div>
+          </div>
+
+          {/* COMMS LINK */}
+          <div className="h-24 border border-green-500/30 bg-green-500/5 p-1 relative flex flex-col">
+            <div className="absolute top-0 left-0 bg-green-500 text-black px-1 text-[10px]">COMMS_LINK // TRANSMIT_DATA</div>
+            <CommsLink contactEmail={profile?.contact_email} />
+          </div>
+        </div>
+      </main>
+
+      {/* FOOTER SECTION */}
+      <footer className="flex-none border-t border-green-500/30 pt-2 mt-4 flex justify-between text-[10px] text-green-500/70">
+        <span>SYSTEM STATUS: NOMINAL // SECURITY LEVEL: 4</span>
+        <span className="animate-pulse">NO SCROLL DETECTED</span>
+      </footer>
     </div>
   )
 }
