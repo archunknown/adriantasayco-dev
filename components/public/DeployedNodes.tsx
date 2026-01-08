@@ -63,14 +63,14 @@ export default function DeployedNodes({ projects }: { projects: Project[] }) {
                             </div>
 
                             {/* Tech Stack Mini-List */}
-                            <div className="flex flex-wrap gap-1 mt-2">
+                            <div className="flex flex-wrap gap-1.5 mt-2">
                                 {project.project_techs.slice(0, 4).map((pt, i) => (
-                                    <span key={i} className="text-[8px] bg-green-500/10 px-1 text-green-500/60 group-hover:text-green-400">
+                                    <span key={i} className="text-[10px] font-bold border border-green-400/60 bg-green-500/20 px-2 py-0.5 text-green-300 group-hover:bg-green-500/40 group-hover:border-green-400 transition-colors">
                                         {pt.tech_stack?.name}
                                     </span>
                                 ))}
                                 {project.project_techs.length > 4 && (
-                                    <span className="text-[8px] text-green-500/40">+{project.project_techs.length - 4}</span>
+                                    <span className="text-[10px] font-bold border border-green-500/30 bg-black/40 px-2 py-0.5 text-green-500/70">+{project.project_techs.length - 4}</span>
                                 )}
                             </div>
                         </div>
@@ -114,7 +114,7 @@ export default function DeployedNodes({ projects }: { projects: Project[] }) {
                                     <h3 className="text-sm font-bold text-green-400 mb-2">&gt; TECH_STACK_MATRIX</h3>
                                     <div className="flex flex-wrap gap-2">
                                         {selectedProject.project_techs.map((pt, i) => (
-                                            <span key={i} className="px-2 py-1 border border-green-500/30 text-[10px] text-green-400 bg-green-500/5">
+                                            <span key={i} className="px-3 py-1.5 border-2 border-green-400 text-xs font-bold text-green-300 bg-green-500/20 hover:bg-green-500/40 transition-colors">
                                                 {pt.tech_stack?.name}
                                             </span>
                                         ))}
