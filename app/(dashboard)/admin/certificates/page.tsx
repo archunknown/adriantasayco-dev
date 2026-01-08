@@ -203,7 +203,7 @@ export default function AdminCertificatesPage() {
                         <Card key={cert.id} className="border-zinc-800 bg-zinc-950 hover:bg-zinc-900/50 transition-colors overflow-hidden">
                             <CardContent className="flex p-0">
                                 {/* Thumbnail Image */}
-                                <div className="relative h-auto w-32 bg-zinc-900 flex-shrink-0">
+                                <div className="relative h-auto w-32 bg-zinc-900 shrink-0">
                                     {cert.image_url ? (
                                         <Image
                                             src={cert.image_url}
