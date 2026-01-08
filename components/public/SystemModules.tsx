@@ -1,7 +1,7 @@
 "use client"
 
-import { Cpu, Database, Globe, Layers, Layout, Server, Terminal, Code2, AppWindow } from "lucide-react"
-import { useState } from "react"
+import { Cpu } from "lucide-react"
+import { useState, useRef, useEffect } from "react"
 
 export type TechStack = {
     id: string
@@ -14,25 +14,33 @@ type SystemModulesProps = {
     modules: TechStack[]
 }
 
+// Cache for failed slugs to avoid re-fetching on re-render
+const failedSlugs = new Set<string>()
+
 const TechIcon = ({ slug, name }: { slug: string; name: string }) => {
-    const [error, setError] = useState(false)
+    const [hasError, setHasError] = useState(() => failedSlugs.has(slug))
+    const imgRef = useRef<HTMLImageElement>(null)
 
-    // Safety check for empty slugs
-    if (!slug) return <Cpu strokeWidth={1.5} className="h-7 w-7" />
+    // Safety check for empty slugs or known failed slugs
+    if (!slug || hasError) {
+        return <Cpu strokeWidth={1.5} className="h-7 w-7 text-green-500/60" />
+    }
 
-    // If we failed to load the CDN icon, fallback to Lucide CPU
-    if (error) return <Cpu strokeWidth={1.5} className="h-7 w-7" />
-
-    // We request the icon in Green-400 (#4ade80) to match the theme
-    // We start grayscale and low opacity, then reveal the "Green Light" on hover via CSS
     const iconUrl = `https://cdn.simpleicons.org/${slug}/4ade80`
+
+    const handleError = () => {
+        failedSlugs.add(slug)
+        setHasError(true)
+    }
 
     return (
         <img
+            ref={imgRef}
             src={iconUrl}
             alt={`${name} icon`}
             className="h-7 w-7 object-contain transition-all duration-300 grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 group-hover:drop-shadow-[0_0_8px_rgba(74,222,128,0.6)]"
-            onError={() => setError(true)}
+            onError={handleError}
+            loading="lazy"
         />
     )
 }
