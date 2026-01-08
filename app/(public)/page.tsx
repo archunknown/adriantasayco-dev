@@ -98,7 +98,7 @@ export default async function HomePage() {
     supabase
       .from("profile")
       .select(
-        "id, full_name, role_title_es, role_title_en, about_me_es, about_me_en, avatar_url, updated_at, contact_email, github_url, linkedin_url, cv_pdf_url"
+        "id, full_name, role_title_es, role_title_en, about_me_es, about_me_en, avatar_url, updated_at, contact_email, github_url, linkedin_url, whatsapp_url, cv_pdf_url"
       )
       .single(),
     supabase

@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import SystemModules, { TechStack } from "./SystemModules"
 import DeployedNodes from "./DeployedNodes"
 import CredentialLogs from "./CredentialLogs"
-import CommsLink from "./CommsLink"
+import ContactModule from "./ContactModule"
 
 type Profile = {
   id: string
@@ -23,6 +23,7 @@ type Profile = {
   contact_email: string | null
   github_url: string | null
   linkedin_url: string | null
+  whatsapp_url: string | null
   cv_pdf_url: string | null
   updated_at: string | null
 }
@@ -171,9 +172,17 @@ export default function MonitorConsole({
     return () => clearInterval(timer)
   }, [])
 
+  // Format time with user's local timezone
   const timeLabel = time
-    ? time.toISOString().replace("T", " // ").split(".")[0]
+    ? `${time.toLocaleDateString("en-CA")} // ${time.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`
     : "--"
+
+  // Get timezone abbreviation (e.g., "EST", "PST", "PET")
+  const timezoneAbbr = time
+    ? Intl.DateTimeFormat("en", { timeZoneName: "short" })
+      .formatToParts(time)
+      .find((part) => part.type === "timeZoneName")?.value ?? "LOCAL"
+    : ""
 
   const labels =
     activeLang === "es"
@@ -216,16 +225,16 @@ export default function MonitorConsole({
 
   return (
     <div className="flex h-full flex-col p-4 md:p-6 lg:p-8 font-mono text-xs md:text-sm text-green-500 overflow-hidden">
-      {/* HEADER SECTION (To be implemented in Phase 2) */}
-      <header className="flex-none border-b border-green-500/30 pb-2 mb-4 flex justify-between items-end">
+      {/* HEADER SECTION */}
+      <header className="flex-none border-b border-green-500/30 pb-2 mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-2">
         <div className="flex gap-4 items-center">
-          <button onClick={() => setHeaderClicks(prev => prev + 1)} className="hover:text-green-400 select-none">
-            <span>SYSTEM_TIME: {timeLabel} EST</span>
+          <button onClick={() => setHeaderClicks(prev => prev + 1)} className="hover:text-green-400 select-none text-[10px] sm:text-xs">
+            <span>SYSTEM_TIME: {timeLabel} {timezoneAbbr}</span>
           </button>
         </div>
-        <div className="flex gap-4 items-center">
+        <div className="flex gap-2 sm:gap-4 items-center">
           <LanguageToggle />
-          <span className="animate-pulse">GRID_POWER: {power}% - STABLE</span>
+          <span className="animate-pulse hidden md:inline">GRID_POWER: {power}% - STABLE</span>
         </div>
       </header>
 
@@ -236,57 +245,70 @@ export default function MonitorConsole({
           {/* OPERATOR PROFILE */}
           <div className="flex-none border border-green-500/30 bg-green-500/5 p-1 relative group">
             <div className="absolute top-0 left-0 bg-green-500 text-black px-1 text-[10px]">OPERATOR_PROFILE</div>
-            <div className="h-48 flex items-center p-4 gap-6 bg-black/40">
-              {/* Avatar Box */}
-              <div className="relative h-32 w-32 shrink-0 border border-green-500/50 p-1">
-                <div className="h-full w-full relative overflow-hidden bg-green-500/10">
-                  {profile?.avatar_url ? (
-                    <Image
-                      src={profile.avatar_url}
-                      alt="Operator"
-                      fill
-                      className="object-cover contrast-125 saturate-0 hover:saturate-100 transition-all duration-500 brightness-90"
-                      unoptimized
-                    />
-                  ) : (
-                    <div className="h-full w-full flex items-center justify-center text-4xl font-bold bg-green-900/20 text-green-500">
-                      {fullName.charAt(0)}
+            <div className="flex flex-col bg-black/40">
+              {/* Top Section: Avatar + Info */}
+              <div className="flex flex-col sm:flex-row items-center sm:items-start p-4 gap-4 sm:gap-6">
+                {/* Avatar Box */}
+                <div className="relative h-20 w-20 sm:h-28 sm:w-28 shrink-0 border border-green-500/50 p-1">
+                  <div className="h-full w-full relative overflow-hidden bg-green-500/10">
+                    {profile?.avatar_url ? (
+                      <Image
+                        src={profile.avatar_url}
+                        alt="Operator"
+                        fill
+                        className="object-cover contrast-125 saturate-0 hover:saturate-100 transition-all duration-500 brightness-90"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="h-full w-full flex items-center justify-center text-2xl sm:text-4xl font-bold bg-green-900/20 text-green-500">
+                        {fullName.charAt(0)}
+                      </div>
+                    )}
+                    {/* Scanline on Avatar */}
+                    <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/50 to-transparent bg-size-[100%_4px] pointer-events-none opacity-50" />
+                  </div>
+                  <div className="absolute -bottom-2 -right-2 h-2 w-2 bg-green-500 animate-pulse" />
+                </div>
+
+                {/* Text Info */}
+                <div className="flex-1 space-y-1 text-xs text-center sm:text-left">
+                  <div className="flex flex-col">
+                    <span className="text-green-500/50 text-[10px] uppercase">NAME:</span>
+                    <span className="text-base sm:text-lg font-bold tracking-wider">{fullName}</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-green-500/50 text-[10px] uppercase">ROLE:</span>
+                    <span className="text-[11px] sm:text-xs">{roleTitle ?? "ENGINEER"}</span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 mt-2">
+                    <div className="flex flex-col">
+                      <span className="text-green-500/50 text-[10px] uppercase">STATUS:</span>
+                      <span className="animate-pulse text-green-400">ONLINE</span>
                     </div>
-                  )}
-                  {/* Scanline on Avatar */}
-                  <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/50 to-transparent bg-size-[100%_4px] pointer-events-none opacity-50" />
+                    {/* CV Download Button */}
+                    <a
+                      href={profile?.cv_pdf_url ?? "#"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`flex items-center gap-2 px-3 py-1.5 border text-[10px] uppercase font-bold transition-colors ${!profile?.cv_pdf_url ? 'opacity-50 cursor-not-allowed border-green-500/20 text-green-500/50' : 'border-green-500/50 text-green-400 hover:bg-green-500 hover:text-black'}`}
+                    >
+                      <FileDown className="h-3 w-3" /> {profile?.cv_pdf_url ? "DOWNLOAD_CV" : "CV_N/A"}
+                    </a>
+                  </div>
                 </div>
-                <div className="absolute -bottom-3 -right-3 h-2 w-2 bg-green-500 animate-pulse" />
               </div>
 
-              {/* Text Info */}
-              <div className="space-y-2 text-xs">
-                <div className="flex flex-col">
-                  <span className="text-green-500/50 text-[10px] uppercase">NAME:</span>
-                  <span className="text-lg font-bold tracking-wider">{fullName}</span>
+              {/* ABOUT Section */}
+              {about && (
+                <div className="border-t border-green-500/20 px-4 py-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-green-500/50 text-[10px] uppercase">ABOUT:</span>
+                  </div>
+                  <p className="text-[11px] text-green-400/80 leading-relaxed line-clamp-3">
+                    {about}
+                  </p>
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-green-500/50 text-[10px] uppercase">ROLE:</span>
-                  <span>{roleTitle ?? "CYBERNETIC ENGINEER"}</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-green-500/50 text-[10px] uppercase">STATUS:</span>
-                  <span className="animate-pulse text-green-400">ONLINE</span>
-                </div>
-                <div className="animate-flicker text-[10px] text-green-500/70 mt-2">
-                  &gt; TEXT FLICKERS...
-                </div>
-
-                {/* CV Download Button */}
-                <a
-                  href={profile?.cv_pdf_url ?? "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`flex items-center gap-2 mt-2 px-2 py-1 border border-green-500/30 text-[10px] uppercase font-bold transition-colors w-fit ${!profile?.cv_pdf_url ? 'opacity-50 cursor-not-allowed text-green-500/50' : 'text-green-400 hover:bg-green-500 hover:text-black'}`}
-                >
-                  <FileDown className="h-3 w-3" /> {profile?.cv_pdf_url ? "DOWNLOAD_CV // .PDF" : "CV_NOT_UPLOADED"}
-                </a>
-              </div>
+              )}
             </div>
           </div>
 
@@ -317,18 +339,23 @@ export default function MonitorConsole({
             </div>
           </div>
 
-          {/* COMMS LINK */}
+          {/* CONTACT MODULE */}
           <div className="h-24 border border-green-500/30 bg-green-500/5 p-1 relative flex flex-col">
-            <div className="absolute top-0 left-0 bg-green-500 text-black px-1 text-[10px]">COMMS_LINK // TRANSMIT_DATA</div>
-            <CommsLink contactEmail={profile?.contact_email} />
+            <div className="absolute top-0 left-0 bg-green-500 text-black px-1 text-[10px]">CONTACT_MODULO // SECURE_COMMS</div>
+            <ContactModule
+              whatsappUrl={profile?.whatsapp_url}
+              linkedinUrl={profile?.linkedin_url}
+              githubUrl={profile?.github_url}
+              contactEmail={profile?.contact_email}
+            />
           </div>
         </div>
       </main>
 
       {/* FOOTER SECTION */}
       <footer className="flex-none border-t border-green-500/30 pt-2 mt-4 flex justify-between text-[10px] text-green-500/70">
-        <span>SYSTEM STATUS: NOMINAL // SECURITY LEVEL: 4</span>
-        <span className="animate-pulse">NO SCROLL DETECTED</span>
+        <span className="truncate">STATUS: NOMINAL</span>
+        <span className="animate-pulse hidden sm:inline">SECURITY LEVEL: 4</span>
       </footer>
     </div>
   )
