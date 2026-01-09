@@ -133,10 +133,29 @@ export default function ProfileAdminPage() {
         const loadingToast = toast.loading("Subiendo CV...")
 
         try {
+            // 1. Get current CV URL to delete old file
+            const { data: currentProfile } = await supabase
+                .from("profile")
+                .select("cv_pdf_url")
+                .eq("id", SINGLETON_ID)
+                .single()
+
+            // 2. Delete old CV if exists
+            if (currentProfile?.cv_pdf_url) {
+                // Extract file path from URL (uploads/cv-xxxxx.pdf)
+                const oldUrl = currentProfile.cv_pdf_url
+                const pathMatch = oldUrl.match(/uploads\/cv-[^/]+\.pdf/)
+                if (pathMatch) {
+                    await supabase.storage
+                        .from("portfolio-assets")
+                        .remove([pathMatch[0]])
+                }
+            }
+
+            // 3. Upload new file
             const fileName = `cv-${Date.now()}.pdf`
             const filePath = `uploads/${fileName}`
 
-            // Upload to Storage
             const { error: uploadError } = await supabase.storage
                 .from("portfolio-assets")
                 .upload(filePath, file, {
@@ -145,7 +164,7 @@ export default function ProfileAdminPage() {
 
             if (uploadError) throw uploadError
 
-            // Get public URL and update profile
+            // 4. Get public URL and update profile
             const { data: { publicUrl } } = supabase.storage
                 .from("portfolio-assets")
                 .getPublicUrl(filePath)
