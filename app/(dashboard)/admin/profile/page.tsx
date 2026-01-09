@@ -20,7 +20,7 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Loader2, Save, Upload } from "lucide-react"
+import { Loader2, Save, Upload, FileText } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export default function ProfileAdminPage() {
@@ -114,6 +114,54 @@ export default function ProfileAdminPage() {
         }
     }
 
+    async function handleCVUpload(e: React.ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files?.[0]
+        if (!file) return
+
+        // Validate PDF
+        if (file.type !== "application/pdf") {
+            toast.error("Solo se permiten archivos PDF")
+            return
+        }
+
+        // Max 5MB
+        if (file.size > 5 * 1024 * 1024) {
+            toast.error("El archivo no debe superar 5MB")
+            return
+        }
+
+        const loadingToast = toast.loading("Subiendo CV...")
+
+        try {
+            const fileName = `cv-${Date.now()}.pdf`
+            const filePath = `uploads/${fileName}`
+
+            // Upload to Storage
+            const { error: uploadError } = await supabase.storage
+                .from("portfolio-assets")
+                .upload(filePath, file, {
+                    contentType: "application/pdf",
+                })
+
+            if (uploadError) throw uploadError
+
+            // Get public URL and update profile
+            const { data: { publicUrl } } = supabase.storage
+                .from("portfolio-assets")
+                .getPublicUrl(filePath)
+
+            await supabase
+                .from("profile")
+                .update({ cv_pdf_url: publicUrl })
+                .eq("id", SINGLETON_ID)
+
+            toast.success("CV actualizado", { id: loadingToast })
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : "Error desconocido"
+            toast.error("Fallo en subida: " + message, { id: loadingToast })
+        }
+    }
+
     if (loading) {
         return (
             <div className="max-w-4xl space-y-8">
@@ -199,6 +247,25 @@ export default function ProfileAdminPage() {
                             onChange={handleImageUpload}
                             className="bg-zinc-900 border-zinc-800"
                         />
+                    </CardContent>
+                </Card>
+
+                {/* CV Upload Card */}
+                <Card className="border-zinc-800 bg-zinc-950 mt-4">
+                    <CardHeader>
+                        <CardTitle className="text-sm uppercase text-zinc-500">CV / Currículum</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div className="w-full rounded-md border border-zinc-800 bg-black p-4 flex items-center justify-center">
+                            <FileText className="h-8 w-8 text-zinc-600" />
+                        </div>
+                        <Input
+                            type="file"
+                            accept="application/pdf"
+                            onChange={handleCVUpload}
+                            className="bg-zinc-900 border-zinc-800"
+                        />
+                        <p className="text-xs text-zinc-500">Solo PDF, máximo 5MB</p>
                     </CardContent>
                 </Card>
 

@@ -73,7 +73,7 @@ export default function ContactModule({
                     <div className="text-green-400 group-hover:text-black transition-colors relative z-10">
                         {contact.icon}
                     </div>
-                    <span className="text-[10px] font-bold tracking-[0.1em] relative z-10">{contact.label}</span>
+                    <span className="text-[10px] font-bold tracking-widest relative z-10">{contact.label}</span>
 
                     {/* Corner accents */}
                     <div className="absolute top-0 left-0 w-1.5 h-1.5 border-t border-l border-green-500/50 opacity-0 group-hover:opacity-100 transition-opacity" />

@@ -243,7 +243,7 @@ export default function MonitorConsole({
         {/* HEADER SECTION - Enhanced */}
         <header className="flex-none border-b border-green-500/40 pb-3 mb-4 flex justify-between items-end relative backdrop-blur-sm">
           {/* Decorative accent line */}
-          <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-green-500/60 to-transparent shadow-[0_0_8px_rgba(74,222,128,0.4)]" />
+          <div className="absolute bottom-0 left-0 w-full h-px bg-linear-to-r from-transparent via-green-500/60 to-transparent shadow-[0_0_8px_rgba(74,222,128,0.4)]" />
 
           <div className="flex gap-4 items-center">
             <button
@@ -297,7 +297,7 @@ export default function MonitorConsole({
                             unoptimized
                           />
                           {/* Enhanced scanline on avatar */}
-                          <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-[length:100%_4px] pointer-events-none opacity-20" />
+                          <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-size-[100%_4px] pointer-events-none opacity-20" />
                           {/* Vignette */}
                           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.6)_100%)] pointer-events-none" />
                         </>
@@ -441,7 +441,7 @@ export default function MonitorConsole({
         {/* FOOTER SECTION - Enhanced */}
         <footer className="flex-none border-t border-green-500/40 pt-3 mt-4 flex justify-between text-[10px] text-green-500/70 relative">
           {/* Decorative top line */}
-          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-green-500/60 to-transparent shadow-[0_0_8px_rgba(74,222,128,0.4)]" />
+          <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-green-500/60 to-transparent shadow-[0_0_8px_rgba(74,222,128,0.4)]" />
 
           <div className="flex items-center gap-2">
             <span className="inline-block w-1 h-1 bg-green-500/50 rounded-full animate-pulse" />

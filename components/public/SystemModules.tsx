@@ -84,7 +84,7 @@ export default function SystemModules({ modules }: SystemModulesProps) {
                                 <div className="absolute -bottom-0.5 -right-0.5 w-1 h-1 bg-green-500" />
                             </>
                         )}
-                        <span className="relative z-10 tracking-[0.1em] font-bold">{cat}</span>
+                        <span className="relative z-10 tracking-widest font-bold">{cat}</span>
                     </button>
                 ))}
             </div>
@@ -100,7 +100,7 @@ export default function SystemModules({ modules }: SystemModulesProps) {
                             style={{ animationDelay: `${index * 30}ms` }}
                         >
                             {/* Hover sweep effect */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 via-transparent to-transparent transform scale-0 group-hover:scale-100 transition-transform duration-500 origin-top-left pointer-events-none" />
+                            <div className="absolute inset-0 bg-linear-to-br from-green-500/10 via-transparent to-transparent transform scale-0 group-hover:scale-100 transition-transform duration-500 origin-top-left pointer-events-none" />
 
                             {/* Icon */}
                             <div className="relative z-10 mb-2">

@@ -114,7 +114,7 @@ function MobileProfileCard({ profile, activeLang }: { profile: Profile | null; a
                                     unoptimized
                                 />
                                 {/* Scanline overlay on avatar */}
-                                <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.4)_50%)] bg-[length:100%_4px] pointer-events-none opacity-20" />
+                                <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.4)_50%)] bg-size-[100%_4px] pointer-events-none opacity-20" />
                             </>
                         ) : (
                             <div className="h-full w-full flex items-center justify-center text-3xl font-bold text-green-500 text-terminal-glow-strong">
@@ -276,7 +276,7 @@ export default function MobileMonitor({
             {/* Header with enhanced styling */}
             <header className="flex-none border-b border-green-500/40 p-3 flex justify-between items-center bg-black/90 backdrop-blur-sm relative">
                 {/* Decorative line */}
-                <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-green-500/50 to-transparent" />
+                <div className="absolute bottom-0 left-0 w-full h-px bg-linear-to-r from-transparent via-green-500/50 to-transparent" />
 
                 <div className="flex items-center gap-2">
                     <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.8)]" />
@@ -314,7 +314,7 @@ export default function MobileMonitor({
             {/* Bottom Navigation Bar - Enhanced */}
             <nav className="flex-none border-t border-green-500/40 flex bg-black/95 backdrop-blur-sm relative">
                 {/* Decorative top line */}
-                <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-green-500/50 to-transparent" />
+                <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-green-500/50 to-transparent" />
 
                 {TABS.map((tab) => (
                     <button

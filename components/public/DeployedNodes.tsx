@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { createPortal } from "react-dom"
 import Image from "next/image"
 import { X, ExternalLink, Github } from "lucide-react"
 
@@ -19,22 +20,26 @@ type Project = {
 }
 
 export default function DeployedNodes({ projects }: { projects: Project[] }) {
-    // Display only top 3 projects
-    const topProjects = projects.slice(0, 3)
     const [selectedProject, setSelectedProject] = useState<Project | null>(null)
+    const [mounted, setMounted] = useState(false)
+
+    // Ensure we only use createPortal after hydration
+    useEffect(() => {
+        setMounted(true)
+    }, [])
 
     return (
         <>
-            <div className="grid grid-rows-3 gap-3 h-full overflow-hidden">
-                {topProjects.map((project, index) => (
+            <div className="flex flex-col gap-3 h-full overflow-y-auto scrollbar-terminal pr-1">
+                {projects.map((project, index) => (
                     <div
                         key={project.id}
                         onClick={() => setSelectedProject(project)}
-                        className="group relative flex items-start gap-4 border border-green-500/30 bg-green-500/5 p-3 hover:bg-green-500/10 hover:border-green-500/60 cursor-pointer transition-all duration-500 overflow-hidden backdrop-blur-sm"
+                        className="group relative flex items-start gap-4 border border-green-500/30 bg-green-500/5 p-3 hover:bg-green-500/10 hover:border-green-500/60 cursor-pointer transition-all duration-500 overflow-hidden backdrop-blur-sm shrink-0 min-h-[100px]"
                         style={{ animationDelay: `${index * 100}ms` }}
                     >
                         {/* Hover sweep effect */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-green-500/10 to-transparent transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
+                        <div className="absolute inset-0 bg-linear-to-r from-transparent via-green-500/10 to-transparent transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
 
                         {/* Corner accents */}
                         <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-green-500/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -49,7 +54,7 @@ export default function DeployedNodes({ projects }: { projects: Project[] }) {
                                 className="object-cover opacity-50 grayscale group-hover:grayscale-0 group-hover:opacity-90 transition-all duration-700 group-hover:scale-110"
                             />
                             {/* CRT scanline overlay */}
-                            <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.8)_50%)] bg-[length:100%_2px] pointer-events-none opacity-20" />
+                            <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.8)_50%)] bg-size-[100%_2px] pointer-events-none opacity-20" />
                             {/* Vignette */}
                             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,rgba(0,0,0,0.7)_100%)] pointer-events-none" />
 
@@ -101,11 +106,11 @@ export default function DeployedNodes({ projects }: { projects: Project[] }) {
                 ))}
             </div>
 
-            {/* Modal / Overlay - Enhanced */}
-            {selectedProject && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-in fade-in duration-300">
+            {/* Modal via Portal to escape parent CSS containment */}
+            {mounted && selectedProject && createPortal(
+                <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-in fade-in duration-300">
                     {/* Scanline overlay on modal background */}
-                    <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.3)_50%)] bg-[length:100%_4px] pointer-events-none opacity-10" />
+                    <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.3)_50%)] bg-size-[100%_4px] pointer-events-none opacity-10" />
 
                     <div className="w-full max-w-3xl bg-black/95 border-2 border-green-500/60 shadow-[0_0_40px_rgba(34,197,94,0.25)] relative flex flex-col max-h-[90vh] overflow-hidden backdrop-blur-sm animate-in zoom-in-95 duration-300">
                         {/* Corner brackets */}
@@ -141,7 +146,7 @@ export default function DeployedNodes({ projects }: { projects: Project[] }) {
                                     className="object-cover opacity-70 group-hover/img:opacity-90 transition-opacity duration-700 grayscale group-hover/img:grayscale-0"
                                 />
                                 {/* CRT effects */}
-                                <div className="absolute inset-0 bg-[linear-gradient(rgba(18,18,18,0)_50%,rgba(0,0,0,0.3)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.02),rgba(0,0,255,0.03))] bg-[length:100%_4px,3px_100%] pointer-events-none" />
+                                <div className="absolute inset-0 bg-[linear-gradient(rgba(18,18,18,0)_50%,rgba(0,0,0,0.3)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.02),rgba(0,0,255,0.03))] bg-size-[100%_4px,3px_100%] pointer-events-none" />
                                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(0,0,0,0.5)_100%)] pointer-events-none" />
                             </div>
 
@@ -152,7 +157,7 @@ export default function DeployedNodes({ projects }: { projects: Project[] }) {
                                         <span className="inline-block w-1 h-1 bg-green-500 rounded-full animate-pulse" />
                                         <h3 className="text-sm font-bold text-green-400 uppercase tracking-[0.15em]">&gt; DESCRIPTION_LOG</h3>
                                     </div>
-                                    <p className="text-sm text-green-500/80 leading-relaxed font-mono font-light">
+                                    <p className="text-sm text-green-500/80 leading-relaxed font-mono font-light wrap-break-word">
                                         {selectedProject.description_en}
                                     </p>
 
@@ -187,7 +192,7 @@ export default function DeployedNodes({ projects }: { projects: Project[] }) {
 
                         {/* Modal Footer (Actions) - Enhanced */}
                         <div className="p-4 border-t border-green-500/40 flex justify-end gap-3 bg-green-500/5 relative">
-                            <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-green-500/50 to-transparent" />
+                            <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-green-500/50 to-transparent" />
 
                             <button className="flex items-center gap-2 px-5 py-2.5 border-2 border-green-500/60 hover:bg-green-500/20 hover:border-green-500 transition-all duration-300 text-xs font-bold uppercase disabled:opacity-50 disabled:cursor-not-allowed tracking-wider hover:shadow-[0_0_15px_rgba(74,222,128,0.3)] group relative overflow-hidden">
                                 <div className="absolute inset-0 bg-green-500/10 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-500" />
@@ -201,7 +206,8 @@ export default function DeployedNodes({ projects }: { projects: Project[] }) {
                             </button>
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </>
     )
